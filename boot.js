@@ -9,7 +9,7 @@ var workerCount = process.env.WORKER_COUNT || 2;
 
 // Defines what each worker needs to run
 // In this case, it's app.js a simple node http app
-cluster.setupMaster({ exec: 'app.js' });
+cluster.setupMaster({ exec: 'bin/www' });
 
 // Gets the count of active workers
 function numWorkers() { return Object.keys(cluster.workers).length; }
