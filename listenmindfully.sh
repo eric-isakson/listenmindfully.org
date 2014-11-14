@@ -816,6 +816,11 @@ EOT
 function www_install {
     git clone https://github.com/eric-isakson/listenmindfully.org.git /var/www
     chmod 755 /var/www
+    cd /var/www
+    npm install
+
+    # create the database
+    echo "use listenmindfully" | mongo
 
 cat <<EOT >/etc/default/www
 NODE_ENV="production"
