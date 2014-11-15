@@ -379,9 +379,6 @@ SCRIPTNAME=/etc/init.d/\$NAME
 # Exit if the package is not installed
 [ -x "\$DAEMON" ] || exit 0
 
-# Read configuration variable file if it is present
-[ -r /etc/default/\$NAME ] && . /etc/default/\$NAME
-
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
 
@@ -402,7 +399,7 @@ do_start()
 	start-stop-daemon --start --chuid \${DAEMONUSER}:\${DAEMONGROUP} --quiet --pidfile \$PIDFILE --exec \$DAEMON --test > /dev/null \
 		|| return 1
 	start-stop-daemon --start --chuid \${DAEMONUSER}:\${DAEMONGROUP} --make-pidfile --quiet --pidfile \$PIDFILE --background --chdir \$DAEMON_DIR\
-                      --startas /bin/bash -- -c "exec \$DAEMON \$DAEMON_ARGS > /var/log/\$NAME.log 2>&1" \
+                      --startas /bin/bash -- -c "source /etc/default/\$NAME && exec \$DAEMON \$DAEMON_ARGS > /var/log/\$NAME.log 2>&1" \
 		|| return 2
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
@@ -529,16 +526,16 @@ function www_install {
     echo "use website" | mongo
 
 cat <<EOT >/etc/default/www
-NODE_ENV="production"
-PORT="3000"
-PUBLIC_HOST="www.listenmindfully.org"
-SESSION_SECRET="${SESSION_SECRET}"
-FACEBOOK_CLIENT_ID="${FACEBOOK_CLIENT_ID}"
-FACEBOOK_CLIENT_SECRET="${FACEBOOK_CLIENT_SECRET}"
-TWITTER_CLIENT_ID="${TWITTER_CLIENT_ID}"
-TWITTER_CLIENT_SECRET="${TWITTER_CLIENT_SECRET}"
-GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}"
-GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET}"
+export NODE_ENV="production"
+export PORT="3000"
+export PUBLIC_HOST="www.listenmindfully.org"
+export SESSION_SECRET="${SESSION_SECRET}"
+export FACEBOOK_CLIENT_ID="${FACEBOOK_CLIENT_ID}"
+export FACEBOOK_CLIENT_SECRET="${FACEBOOK_CLIENT_SECRET}"
+export TWITTER_CLIENT_ID="${TWITTER_CLIENT_ID}"
+export TWITTER_CLIENT_SECRET="${TWITTER_CLIENT_SECRET}"
+export GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}"
+export GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET}"
 EOT
 
     node_init_script www
@@ -700,7 +697,7 @@ cat <<EOT >/etc/monit/conf.d/mongodb.cfg
   check process mongodb with pidfile /var/lib/mongodb/mongod.lock
     start program = "/sbin/start mongodb"
     stop  program = "/sbin/stop mongodb"
-    if failed host localhost port 28017 protocol http
+    if failed host localhost port 27017 protocol http
       and request "/" with timeout 10 seconds then restart
     if 5 restarts within 5 cycles then timeout
     group database

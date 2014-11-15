@@ -1,6 +1,6 @@
 // config/database.js
 module.exports = {
 
-	'url' : 'mongodb://localhost:28017/website'
+	'url' : 'mongodb://localhost:27017/website'
 
 };
