@@ -2,16 +2,21 @@
 #
 # <UDF name="user_password" label="User password" />
 # <UDF name="haproxy_password" label="HAProxy stats password" />
+# <UDF name="session_secret" label="Session secret" />
+# <UDF name="facebook_client_id" label="Facebook client id" />
+# <UDF name="facebook_client_secret" label="Facebook client secret" />
+# <UDF name="twitte_client_id" label="Twitter client id" />
+# <UDF name="twitter_client_secret" label="Twitter client secret" />
+# <UDF name="google_client_id" label="Google client id" />
+# <UDF name="google_client_secret" label="Google client secret" />
 
-NOTIFY_EMAIL=eric.david.isakson@gmail.com
+SYS_HOSTNAME="amber"
 USER_NAME="eric"
 USER_SSHKEY="ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAgd1shp+Tvj1LYoW6r+UrvL/G1y1e25JW9mpnRcsxvllBlALAP5LxGfyZJDFg+HfmGszTABMrYRUxwPy+awDjNZrjl021YwY10JkWINvEXZjI7KKC5VppZx1E0VHGWdshlFxUQefNp2j5P1l08qKemtDJWeF0y4dVF0LqH+JvCQ0= rsa-key-20120530"
-SSHD_PASSWORDAUTH="No"
-SSHD_PERMITROOTLOGIN="No"
+NOTIFY_EMAIL="eric.david.isakson@gmail.com"
+WEBSITE_CLONE_URL="https://github.com/eric-isakson/listenmindfully.org.git"
+
 USER_SHELL="/bin/bash"
-SYS_HOSTNAME="amber"
-SETUP_MONGODB="Yes"
-SETUP_MONIT="Yes"
 USER_GROUPS=sudo
 
 ###########################################################
@@ -125,292 +130,6 @@ function ssh_disable_root {
     touch /tmp/restart-ssh
 
 }
-
-
-###########################################################
-# Apache
-###########################################################
-
-function apache_install {
-    # installs the system default apache2 MPM
-    aptitude -y install apache2
-
-    a2dissite default # disable the interfering default virtualhost
-
-    # clean up, or add the NameVirtualHost line to ports.conf
-    sed -i -e 's/^NameVirtualHost \*$/NameVirtualHost *:80/' /etc/apache2/ports.conf
-    if ! grep -q NameVirtualHost /etc/apache2/ports.conf; then
-        echo 'NameVirtualHost *:80' > /etc/apache2/ports.conf.tmp
-        cat /etc/apache2/ports.conf >> /etc/apache2/ports.conf.tmp
-        mv -f /etc/apache2/ports.conf.tmp /etc/apache2/ports.conf
-    fi
-}
-
-function apache_tune {
-    # Tunes Apache's memory to use the percentage of RAM you specify, defaulting to 40%
-
-    # $1 - the percent of system memory to allocate towards Apache
-
-    if [ ! -n "$1" ];
-        then PERCENT=40
-        else PERCENT="$1"
-    fi
-
-    aptitude -y install apache2-mpm-prefork
-    PERPROCMEM=10 # the amount of memory in MB each apache process is likely to utilize
-    MEM=$(grep MemTotal /proc/meminfo | awk '{ print int($2/1024) }') # how much memory in MB this system has
-    MAXCLIENTS=$((MEM*PERCENT/100/PERPROCMEM)) # calculate MaxClients
-    MAXCLIENTS=${MAXCLIENTS/.*} # cast to an integer
-    sed -i -e "s/\(^[ \t]*MaxClients[ \t]*\)[0-9]*/\1$MAXCLIENTS/" /etc/apache2/apache2.conf
-
-    touch /tmp/restart-apache2
-}
-
-function apache_virtualhost {
-    # Configures a VirtualHost
-
-    # $1 - required - the hostname of the virtualhost to create
-
-    if [ ! -n "$1" ]; then
-        echo "apache_virtualhost() requires the hostname as the first argument"
-        return 1;
-    fi
-
-    if [ -e "/etc/apache2/sites-available/$1" ]; then
-        echo /etc/apache2/sites-available/$1 already exists
-        return;
-    fi
-
-    mkdir -p /srv/www/$1/public_html /srv/www/$1/logs
-
-    echo "<VirtualHost *:80>" > /etc/apache2/sites-available/$1
-    echo "    ServerName $1" >> /etc/apache2/sites-available/$1
-    echo "    DocumentRoot /srv/www/$1/public_html/" >> /etc/apache2/sites-available/$1
-    echo "    ErrorLog /srv/www/$1/logs/error.log" >> /etc/apache2/sites-available/$1
-    echo "    CustomLog /srv/www/$1/logs/access.log combined" >> /etc/apache2/sites-available/$1
-    echo "</VirtualHost>" >> /etc/apache2/sites-available/$1
-
-    a2ensite $1
-
-    touch /tmp/restart-apache2
-}
-
-function apache_virtualhost_from_rdns {
-    # Configures a VirtualHost using the rdns of the first IP as the ServerName
-
-    apache_virtualhost $(get_rdns_primary_ip)
-}
-
-
-function apache_virtualhost_get_docroot {
-    if [ ! -n "$1" ]; then
-        echo "apache_virtualhost_get_docroot() requires the hostname as the first argument"
-        return 1;
-    fi
-
-    if [ -e /etc/apache2/sites-available/$1 ];
-        then echo $(awk '/DocumentRoot/ {print $2}' /etc/apache2/sites-available/$1 )
-    fi
-}
-
-###########################################################
-# mysql-server
-###########################################################
-
-function mysql_install {
-    # $1 - the mysql root password
-
-    if [ ! -n "$1" ]; then
-        echo "mysql_install() requires the root pass as its first argument"
-        return 1;
-    fi
-
-    echo "mysql-server mysql-server/root_password password $1" | debconf-set-selections
-    echo "mysql-server mysql-server/root_password_again password $1" | debconf-set-selections
-    apt-get -y install mysql-server mysql-client
-
-    echo "Sleeping while MySQL starts up for the first time..."
-    sleep 5
-}
-
-function mysql_tune {
-    # Tunes MySQL's memory usage to utilize the percentage of memory you specify, defaulting to 40%
-
-    # $1 - the percent of system memory to allocate towards MySQL
-
-    if [ ! -n "$1" ];
-        then PERCENT=40
-        else PERCENT="$1"
-    fi
-
-    sed -i -e 's/^#skip-innodb/skip-innodb/' /etc/mysql/my.cnf # disable innodb - saves about 100M
-
-    MEM=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo) # how much memory in MB this system has
-    MYMEM=$((MEM*PERCENT/100)) # how much memory we'd like to tune mysql with
-    MYMEMCHUNKS=$((MYMEM/4)) # how many 4MB chunks we have to play with
-
-    # mysql config options we want to set to the percentages in the second list, respectively
-    OPTLIST=(key_buffer sort_buffer_size read_buffer_size read_rnd_buffer_size myisam_sort_buffer_size query_cache_size)
-    DISTLIST=(75 1 1 1 5 15)
-
-    for opt in ${OPTLIST[@]}; do
-        sed -i -e "/\[mysqld\]/,/\[.*\]/s/^$opt/#$opt/" /etc/mysql/my.cnf
-    done
-
-    for i in ${!OPTLIST[*]}; do
-        val=$(echo | awk "{print int((${DISTLIST[$i]} * $MYMEMCHUNKS/100))*4}")
-        if [ $val -lt 4 ]
-            then val=4
-        fi
-        config="${config}\n${OPTLIST[$i]} = ${val}M"
-    done
-
-    sed -i -e "s/\(\[mysqld\]\)/\1\n$config\n/" /etc/mysql/my.cnf
-
-    touch /tmp/restart-mysql
-}
-
-function mysql_create_database {
-    # $1 - the mysql root password
-    # $2 - the db name to create
-
-    if [ ! -n "$1" ]; then
-        echo "mysql_create_database() requires the root pass as its first argument"
-        return 1;
-    fi
-    if [ ! -n "$2" ]; then
-        echo "mysql_create_database() requires the name of the database as the second argument"
-        return 1;
-    fi
-
-    echo "CREATE DATABASE $2;" | mysql -u root -p$1
-}
-
-function mysql_create_user {
-    # $1 - the mysql root password
-    # $2 - the user to create
-    # $3 - their password
-
-    if [ ! -n "$1" ]; then
-        echo "mysql_create_user() requires the root pass as its first argument"
-        return 1;
-    fi
-    if [ ! -n "$2" ]; then
-        echo "mysql_create_user() requires username as the second argument"
-        return 1;
-    fi
-    if [ ! -n "$3" ]; then
-        echo "mysql_create_user() requires a password as the third argument"
-        return 1;
-    fi
-
-    echo "CREATE USER '$2'@'localhost' IDENTIFIED BY '$3';" | mysql -u root -p$1
-}
-
-function mysql_grant_user {
-    # $1 - the mysql root password
-    # $2 - the user to bestow privileges
-    # $3 - the database
-
-    if [ ! -n "$1" ]; then
-        echo "mysql_create_user() requires the root pass as its first argument"
-        return 1;
-    fi
-    if [ ! -n "$2" ]; then
-        echo "mysql_create_user() requires username as the second argument"
-        return 1;
-    fi
-    if [ ! -n "$3" ]; then
-        echo "mysql_create_user() requires a database as the third argument"
-        return 1;
-    fi
-
-    echo "GRANT ALL PRIVILEGES ON $3.* TO '$2'@'localhost';" | mysql -u root -p$1
-    echo "FLUSH PRIVILEGES;" | mysql -u root -p$1
-
-}
-
-###########################################################
-# PHP functions
-###########################################################
-
-function php_install_with_apache {
-    aptitude -y install php5 php5-mysql libapache2-mod-php5
-    touch /tmp/restart-apache2
-}
-
-function php_tune {
-    # Tunes PHP to utilize up to 32M per process
-
-    sed -i'-orig' 's/memory_limit = [0-9]\+M/memory_limit = 32M/' /etc/php5/apache2/php.ini
-    touch /tmp/restart-apache2
-}
-
-###########################################################
-# Wordpress functions
-###########################################################
-
-function wordpress_install {
-    # installs the latest wordpress tarball from wordpress.org
-
-    # $1 - required - The existing virtualhost to install into
-
-    if [ ! -n "$1" ]; then
-        echo "wordpress_install() requires the vitualhost as its first argument"
-        return 1;
-    fi
-
-    if [ ! -e /usr/bin/wget ]; then
-        aptitude -y install wget
-    fi
-
-    VPATH=$(apache_virtualhost_get_docroot $1)
-
-    if [ ! -n "$VPATH" ]; then
-        echo "Could not determine DocumentRoot for $1"
-        return 1;
-    fi
-
-    # download, extract, chown, and get our config file started
-    cd $VPATH
-    wget http://wordpress.org/latest.tar.gz
-    tar xfz latest.tar.gz
-    chown -R www-data: wordpress/
-    cd $VPATH/wordpress
-    cp wp-config-sample.php wp-config.php
-    chown www-data wp-config.php
-    chmod 640 wp-config.php
-
-    # database configuration
-    WPPASS=$(randomString 20)
-    mysql_create_database "$DB_PASSWORD" wordpress
-    mysql_create_user "$DB_PASSWORD" wordpress "$WPPASS"
-    mysql_grant_user "$DB_PASSWORD" wordpress wordpress
-
-    # configuration file updates
-    for i in {1..4}
-        do sed -i "0,/put your unique phrase here/s/put your unique phrase here/$(randomString 50)/" wp-config.php
-    done
-
-    sed -i 's/database_name_here/wordpress/' wp-config.php
-    sed -i 's/username_here/wordpress/' wp-config.php
-    sed -i "s/password_here/$WPPASS/" wp-config.php
-
-    # http://downloads.wordpress.org/plugin/wp-super-cache.0.9.8.zip
-}
-
-###########################################################
-# Other niceties!
-###########################################################
-
-function goodstuff {
-    # Installs the REAL vim, wget, less, and enables color root prompt and the "ll" list long alias
-
-    aptitude -y install wget vim less
-    sed -i -e 's/^#PS1=/PS1=/' /root/.bashrc # enable the colorful root bash prompt
-    sed -i -e "s/^#alias ll='ls -l'/alias ll='ls -al'/" /root/.bashrc # enable ll list long alias <3
-}
-
 
 ###########################################################
 # utility functions
@@ -596,19 +315,6 @@ function system_enable_universe {
 
 function system_security_ufw_install {
     aptitude -y install ufw
-}
-
-function python_install {
-    aptitude -y install python python-dev python-setuptools
-    easy_install pip
-    pip install virtualenv virtualenvwrapper
-}
-
-function ansible_install {
-    aptitude -y install software-properties-common
-    apt-add-repository -y ppa:ansible/ansible
-    aptitude -y update
-    aptitude -y install ansible
 }
 
 function git_install {
@@ -814,17 +520,25 @@ EOT
 }
 
 function www_install {
-    git clone https://github.com/eric-isakson/listenmindfully.org.git /var/www
+    git clone ${WEBSITE_CLONE_URL} /var/www
     chmod 755 /var/www
     cd /var/www
     npm install
 
     # create the database
-    echo "use listenmindfully" | mongo
+    echo "use website" | mongo
 
 cat <<EOT >/etc/default/www
 NODE_ENV="production"
 PORT="3000"
+PUBLIC_HOST="www.listenmindfully.org"
+SESSION_SECRET="${SESSION_SECRET}"
+FACEBOOK_CLIENT_ID="${FACEBOOK_CLIENT_ID}"
+FACEBOOK_CLIENT_SECRET="${FACEBOOK_CLIENT_SECRET}"
+TWITTER_CLIENT_ID="${TWITTER_CLIENT_ID}"
+TWITTER_CLIENT_SECRET="${TWITTER_CLIENT_SECRET}"
+GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}"
+GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET}"
 EOT
 
     node_init_script www
@@ -981,67 +695,6 @@ cat <<EOT >/etc/monit/conf.d/postfix.cfg
 EOT
 }
 
-
-function monit_def_postgresql {
-cat <<EOT >/etc/monit/conf.d/postgresql.cfg
-  check process postgres with pidfile /var/run/postgresql/9.1-main.pid
-    start program = "/etc/init.d/postgresql start"
-    stop program = "/etc/init.d/postgresql stop"
-    if failed unixsocket /var/run/postgresql/.s.PGSQL.5432 protocol pgsql then restart
-    if failed host localhost port 5432 protocol pgsql then restart
-    if 5 restarts within 5 cycles then timeout
-    depends on postgresql_bin
-    depends on postgresql_rc
-    group database
-
-  check file postgresql_bin with path /usr/lib/postgresql/9.1/bin/postgres
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group database
-
-  check file postgresql_rc with path /etc/init.d/postgresql
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group database
-
-  check file postgresql_log with path /var/log/postgresql/postgresql-9.1-main.log
-    if size > 100 MB then alert
-    group database
-EOT
-}
-
-function monit_def_mysql {
-cat <<EOT > /etc/monit/conf.d/mysql.cfg
-  check process mysqld with pidfile /var/run/mysqld/mysqld.pid
-    start program = "/sbin/start mysql" with timeout 20 seconds
-    stop program = "/sbin/stop mysql"
-    if failed host localhost port 3306 protocol mysql then restart
-    if failed unixsocket /var/run/mysqld/mysqld.sock protocol mysql then restart
-    if 5 restarts within 5 cycles then timeout
-    depends on mysql_bin
-    depends on mysql_rc
-    group database
-
-  check file mysql_bin with path /usr/sbin/mysqld
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group database
-
-  check file mysql_rc with path /etc/init.d/mysql
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group database
-EOT
-}
-
 function monit_def_mongodb {
 cat <<EOT >/etc/monit/conf.d/mongodb.cfg
   check process mongodb with pidfile /var/lib/mongodb/mongod.lock
@@ -1051,50 +704,6 @@ cat <<EOT >/etc/monit/conf.d/mongodb.cfg
       and request "/" with timeout 10 seconds then restart
     if 5 restarts within 5 cycles then timeout
     group database
-EOT
-}
-
-function monit_def_memcached {
-cat <<EOT >/etc/monit/conf.d/memcached.cfg
-  check process memcached with pidfile /var/run/memcached.pid
-    start program = "/etc/init.d/memcached start"
-    stop program = "/etc/init.d/memcached stop"
-    if 5 restarts within 5 cycles then timeout
-    group database
-EOT
-}
-
-function monit_def_apache {
-cat <<EOT >/etc/monit/conf.d/apache2.cfg
-  check process apache with pidfile /var/run/apache2.pid
-    start program = "/etc/init.d/apache2 start"
-    stop  program = "/etc/init.d/apache2 stop"
-    if cpu > 60% for 2 cycles then alert
-    if cpu > 80% for 5 cycles then alert
-    if totalmem > 200.0 MB for 5 cycles then alert
-    if children > 250 then alert
-    if loadavg(5min) greater than 10 for 8 cycles then stop
-    if failed host localhost port 80 protocol HTTP request / within 2 cycles then alert
-    if failed host localhost port 80 protocol apache-status
-        dnslimit > 25% or  loglimit > 80% or waitlimit < 20% retry 2 within 2 cycles then alert
-    #if 5 restarts within 5 cycles then timeout
-    depends on apache_bin
-    depends on apache_rc
-    group www
-
-  check file apache_bin with path /usr/sbin/apache2
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group www
-
-  check file apache_rc with path /etc/init.d/apache2
-    if failed checksum then unmonitor
-    if failed permission 755 then unmonitor
-    if failed uid root then unmonitor
-    if failed gid root then unmonitor
-    group www
 EOT
 }
 
@@ -1256,19 +865,14 @@ system_update_hostname "$SYS_HOSTNAME"
 
 # Create user account
 system_add_user "$USER_NAME" "$USER_PASSWORD" "$USER_GROUPS" "$USER_SHELL"
-if [ "$USER_SSHKEY" ]; then
-    system_user_add_ssh_key "$USER_NAME" "$USER_SSHKEY"
-fi
+system_user_add_ssh_key "$USER_NAME" "$USER_SSHKEY"
 
 # Configure sshd
-system_sshd_permitrootlogin "$SSHD_PERMITROOTLOGIN"
-system_sshd_passwordauthentication "$SSHD_PASSWORDAUTH"
+system_sshd_permitrootlogin "No"
+system_sshd_passwordauthentication "No"
 touch /tmp/restart-ssh
 
-# Lock user account if not used for login
-if [ "SSHD_PERMITROOTLOGIN" == "No" ]; then
-    system_lock_user "root"
-fi
+system_lock_user "root"
 
 # Install Postfix
 postfix_install
@@ -1286,10 +890,6 @@ system_install_utils
 
 system_install_build
 
-#python_install
-
-#ansible_install
-
 git_install
 
 node_install
@@ -1298,30 +898,25 @@ www_install
 
 haproxy_install
 
-# Install MongoDB
-if [ "$SETUP_MONGODB" == "Yes" ]; then
-    mongodb_install
-fi
+mongodb_install
 
 restart_services
 restart_initd_services
 
-if [ "$SETUP_MONIT" == "Yes" ]; then
-    monit_install
+monit_install
 
-    monit_configure_email "$NOTIFY_EMAIL"
-    monit_configure_web $(system_primary_ip)
+monit_configure_email "$NOTIFY_EMAIL"
+monit_configure_web $(system_primary_ip)
 
-    monit_def_system "$SYS_HOSTNAME"
-    monit_def_rootfs
-    monit_def_cron
-    monit_def_postfix
-    monit_def_ping_google
-    monit_def_www
-    monit_def_haproxy
-    if [ "$SETUP_MONGODB" == "Yes" ]; then monit_def_mongodb; fi
-    monit reload
-fi
+monit_def_system "$SYS_HOSTNAME"
+monit_def_rootfs
+monit_def_cron
+monit_def_postfix
+monit_def_ping_google
+monit_def_www
+monit_def_haproxy
+monit_def_mongodb
+monit reload
 
 # Send info message
 RDNS=$(system_primary_ip)
@@ -1332,12 +927,10 @@ Your Linode VPS configuration is completed.
 
 EOD
 
-if [ "$SETUP_MONIT" == "Yes" ]; then
-    cat >> ~/setup_message <<EOD
+cat >> ~/setup_message <<EOD
 Monit web interface is at http://${RDNS}:2812/ (use your system username/password).
 
 EOD
-fi
 
 cat >> ~/setup_message <<EOD
 To access your server ssh to $USER_NAME@$RDNS

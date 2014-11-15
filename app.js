@@ -1,39 +1,46 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
+// app.js
+
+// set up ======================================================================
+// get all the tools we need
+var express  = require('express');
+var app      = express();
+var mongoose = require('mongoose');
+var passport = require('passport');
+var flash    = require('connect-flash');
+
+var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var bodyParser   = require('body-parser');
+var session      = require('express-session');
+var favicon = require('serve-favicon');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var configDB = require('./config/database.js');
 
-var app = express();
+// configuration ===============================================================
+mongoose.connect(configDB.url); // connect to our database
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+require('./config/passport')(passport); // pass passport for configuration
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// set up our express application
+app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.json()); // get information from html forms
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-// Database
-var mongo = require('mongoskin');
-var db = mongo.db("mongodb://localhost:28017/listenmindfully", {native_parser:true});
 
-// Make our db accessible to our router
-app.use(function(req,res,next){
-    req.db = db;
-    next();
-});
+app.set('view engine', 'ejs'); // set up ejs for templating
 
-app.use('/', routes);
-app.use('/users', users);
+// required for passport
+app.use(session({ secret: process.env.SESSION_SECRET })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 
+// routes ======================================================================
+require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+
+// errors ======================================================================
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
