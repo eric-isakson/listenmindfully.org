@@ -894,11 +894,11 @@ git_install
 
 node_install
 
+mongodb_install
+
 www_install
 
 haproxy_install
-
-mongodb_install
 
 restart_services
 restart_initd_services
