@@ -119,8 +119,8 @@ module.exports = function(passport) {
         passport.use(new Strategy(secrets,
             function (req, token, refreshToken, profile, done) {
                 function populateAndSave(user) {
-                    user[service + ".id"] = profile.id;
-                    user[service + ".token"] = token;
+                    user.set(service + ".id", profile.id);
+                    user.set(service + ".token", token);
                     populate(user, profile);
                     user.save(function (err) {
                         if (err)
