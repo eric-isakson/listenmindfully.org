@@ -58,9 +58,11 @@ function stopNextWorker() {
 function stopAllWorkers() {
     stopping = true;
     console.log('stopping all workers');
-    cluster.workers.forEach(function (worker) {
-        stopWorker(worker);
-    });
+    for (var id in cluster.workers) {
+        if (cluster.workers.hasOwnProperty(id)) {
+            stopWorker(cluster.workers[id]);
+        }
+    }
 }
 
 // Worker is now listening on a port
