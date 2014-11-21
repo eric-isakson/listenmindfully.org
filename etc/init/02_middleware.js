@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 var express = require('express')
-    , path = require('path')
     , cookieParser = require('cookie-parser')
     , bodyParser = require('body-parser')
     , methodOverride = require('method-override')
@@ -17,7 +16,7 @@ module.exports = function () {
     this.use(bodyParser.json());
     this.use(bodyParser.urlencoded({ extended: true }));
     this.use(methodOverride());
-    this.use(express.static(path.join(__dirname, 'public')));
+    this.use(express.static('public'));
 
     // errors ======================================================================
     // catch 404 and forward to error handler
