@@ -1,8 +1,7 @@
 /**
  * Module dependencies.
  */
-var http = require('http')
-    , express = require('express')
+var express = require('express')
     , bootable = require('bootable');
 
 
@@ -19,7 +18,7 @@ app.phase(bootable.initializers('etc/init', app));
 app.phase(bootable.routes(__dirname + '/routes.js', app));
 // listen for HTTP requests
 app.phase(function listen(done) {
-    http.createServer(app).listen(process.env.PORT || 3000, function (err) {
+    app.listen(process.env.PORT || 3000, function (err) {
         if (err) {
             return done(err);
         }
