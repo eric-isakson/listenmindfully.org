@@ -7,7 +7,7 @@
  *
  *   - `logger`  Logger for logging warnings, errors, etc.
  */
-exports = module.exports = function(logger) {
+exports = module.exports = function (logger) {
 
     function logRequest(req, res, next) {
         logger.info(req.ip + ' ' + req.path + ' ' + req.headers['user-agent']);
@@ -17,7 +17,7 @@ exports = module.exports = function(logger) {
     return [
         logRequest
     ];
-}
+};
 
 /**
  * Component annotations.

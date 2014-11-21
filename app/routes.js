@@ -13,6 +13,6 @@ var IoC = require('electrolyte');
  */
 module.exports = function routes() {
 
-  this.all('*', IoC.create('handlers/all'));
+    this.all('*', IoC.create('handlers/all'));
 
-}
+};
