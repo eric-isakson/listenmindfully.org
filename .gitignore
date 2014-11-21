@@ -29,3 +29,5 @@ node_modules
 /.idea/
 /listenmindfully.org.iml
 /listenmindfully.secrets
+
+/electrolyte
