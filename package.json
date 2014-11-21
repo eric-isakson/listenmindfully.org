@@ -6,9 +6,24 @@
         "express": "*",
         "bootable": "*",
         "bootable-environment": "*",
-        "electrolyte": "*"
+        "electrolyte": "*",
+        "mongoose": "*",
+        "mongoose-session": "*",
+        "passport": "*",
+        "passport-local": "*",
+        "passport-facebook": "*",
+        "passport-twitter": "*",
+        "passport-google-oauth": "*",
+        "connect-flash": "*",
+        "bcrypt-nodejs": "*",
+        "morgan": "*",
+        "body-parser": "*",
+        "cookie-parser": "*",
+        "method-override": "*",
+        "express-session": "*",
     },
     "scripts": {
         "start": "node ./bin/www"
-    }
+    },
+    "jshintConfig": "./jshintrc"
 }
