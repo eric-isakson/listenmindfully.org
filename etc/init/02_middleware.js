@@ -42,8 +42,6 @@ module.exports = function () {
     // production error handler
     // no stacktraces leaked to user
     this.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.type('text');
-        res.send(err.status + ' ' + err.message);
+        res.sendStatus(err.status || 500);
     });
 };
