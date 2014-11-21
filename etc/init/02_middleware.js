@@ -34,6 +34,7 @@ module.exports = function () {
     if (this.get('env') === 'development') {
         this.use(function (err, req, res, next) {
             res.status(err.status || 500);
+            res.type('text');
             res.send(err.status + ' ' + err.message + '\n' + err.stack);
         });
     }
@@ -42,6 +43,7 @@ module.exports = function () {
     // no stacktraces leaked to user
     this.use(function (err, req, res, next) {
         res.status(err.status || 500);
+        res.type('text');
         res.send(err.status + ' ' + err.message);
     });
 };
