@@ -8,9 +8,16 @@
  *   - `logger`  Logger for logging warnings, errors, etc.
  */
 exports = module.exports = function (logger) {
-
     function logRequest(req, res, next) {
-        logger.info(req.ip + ' ' + req.path + ' ' + req.headers['user-agent']);
+        var message = req.ip + ' ' + req.path + ' ' + req.headers['user-agent'];
+        if (this.get('env') === 'development') {
+            for (var header in req.headers) {
+                if (req.headers.hasOwnProperty(header)) {
+                    message += '\n' + header + '=' + req.headers[header];
+                }
+            }
+        }
+        logger.info(message);
         next();
     }
 
