@@ -9,7 +9,9 @@
  */
 exports = module.exports = function (logger, settings) {
     function logRequest(req, res, next) {
-        var message = req.ip + ' ' + req.path + ' ' + req.headers['user-agent'];
+        var ip = req.headers['x-forwarded-for'] || req.ip
+            , host = req.headers['host']
+            , message = ip + ' ' + host + ' ' + req.path;
         if (settings.get('env') === 'development') {
             for (var header in req.headers) {
                 if (req.headers.hasOwnProperty(header)) {
