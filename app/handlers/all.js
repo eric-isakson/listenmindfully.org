@@ -7,10 +7,10 @@
  *
  *   - `logger`  Logger for logging warnings, errors, etc.
  */
-exports = module.exports = function (logger) {
+exports = module.exports = function (logger, settings) {
     function logRequest(req, res, next) {
         var message = req.ip + ' ' + req.path + ' ' + req.headers['user-agent'];
-        if (this.get('env') === 'development') {
+        if (settings.get('env') === 'development') {
             for (var header in req.headers) {
                 if (req.headers.hasOwnProperty(header)) {
                     message += '\n' + header + '=' + req.headers[header];
@@ -29,4 +29,4 @@ exports = module.exports = function (logger) {
 /**
  * Component annotations.
  */
-exports['@require'] = [ 'logger' ];
+exports['@require'] = [ 'logger', 'settings' ];
