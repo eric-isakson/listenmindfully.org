@@ -1,10 +1,16 @@
 // route middleware to ensure user is logged in
-module.exports = function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
+exports = module.exports = function () {
+    function isLoggedIn(req, res, next) {
+        if (req.isAuthenticated()) {
+            return next();
+        }
+
+        res.redirect('/');
     }
 
-    res.redirect('/');
+    return [
+        isLoggedIn
+    ];
 };
 /**
  * Component annotations.
