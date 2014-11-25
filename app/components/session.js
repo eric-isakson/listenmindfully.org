@@ -13,7 +13,7 @@ var mongoose = require('mongoose')
 exports = module.exports = function (logger, settings) {
     // TODO get settings specific to session db rather than process.env
     // TODO log the connection attempt and handle errors
-    var db = mongoose.createConnection(process.env.DB_URL, { server: { keepAlive: 1 } }); // connect to our database
+    var db = mongoose.connect(process.env.DB_URL, { server: { keepAlive: 1 } }); // connect to our database
     return session({
         key: 'session',
         // TODO use settings rather than process.env
