@@ -1,7 +1,8 @@
 /**
  * Module dependencies.
  */
-var bcrypt = require('bcrypt-nodejs');
+var mongoose = require('mongoose')
+    , bcrypt = require('bcrypt-nodejs');
 
 /**
  * Initialize the database connection and wires it as the express session store.
@@ -11,7 +12,7 @@ var bcrypt = require('bcrypt-nodejs');
 exports = module.exports = function (logger, settings, db) {
     // TODO get settings specific to session db rather than process.env
     // TODO log the connection attempt and handle errors
-    var userSchema = db.Schema({
+    var userSchema = mongoose.Schema({
 
         local: {
             email: String,
