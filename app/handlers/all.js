@@ -31,4 +31,5 @@ exports = module.exports = function (logger, settings) {
 /**
  * Component annotations.
  */
+exports['@singleton'] = true;
 exports['@require'] = [ 'logger', 'settings' ];
