@@ -9,8 +9,10 @@ var express = require('express')
  */
 exports = module.exports = function (login, link, unlink, logout) {
     // NOTE: The login callback route must match the callbacks defined in components/passport.setupStrategy()
-    router.get('/login/:service/callback?', login);
-    router.get('/link/:service/callback?', link);
+    router.get('/login/:service', login);
+    router.get('/login/:service/callback', login);
+    router.get('/link/:service', link);
+    router.get('/link/:service/callback', link);
     router.get('/unlink/:service', unlink);
     router.get('/logout', logout);
     // TODO add support for local signup and authentication
