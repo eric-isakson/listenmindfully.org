@@ -15,7 +15,7 @@ var IoC = require('electrolyte')
 module.exports = function routes() {
 
     // handler applied to all requests =============================================
-    this.all('/', IoC.create('handlers/all'));
+    this.all('/*', IoC.create('handlers/all'));
 
     // static content ==============================================================
     this.use(express.static('public'));
