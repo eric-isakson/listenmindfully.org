@@ -15,7 +15,8 @@ exports = module.exports = function (login, link, unlink, logout) {
     router.get('/link/:service/callback', link);
     router.get('/unlink/:service', unlink);
     router.get('/logout', logout);
-    // TODO add support for local signup and authentication
+    // TODO add support for local signup and authentication but pay attention to injection vulnerabilities
+    // See http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html
 
     return router;
 };

@@ -20,7 +20,9 @@
         "body-parser": "*",
         "cookie-parser": "*",
         "method-override": "*",
-        "express-session": "*"
+        "express-session": "*",
+        "csurf": "*",
+        "helmet": "*"
     },
     "scripts": {
         "start": "node ./bin/www"
