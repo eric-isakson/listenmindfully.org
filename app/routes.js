@@ -13,10 +13,6 @@ var IoC = require('electrolyte')
  * facilities, configuration settings, etc.
  */
 module.exports = function routes() {
-
-    // handler applied to all requests =============================================
-    this.all('/*', IoC.create('handlers/all'));
-
     // static content ==============================================================
     this.use(express.static('public'));
 
@@ -27,18 +23,17 @@ module.exports = function routes() {
     this.use('/api', IoC.create('handlers/api'));
 
 
-    // errors ======================================================================
-    // catch 404 and forward to error handler
+    // catch 404 and forward to error handler ======================================
     this.use(function (req, res, next) {
         var err = new Error('Not Found');
         err.status = 404;
         next(err);
     });
 
-    // error handlers
+    // errors ======================================================================
 
     // development error handler
-    // will print stacktrace
+    // will print stacktrace in response
     if (this.get('env') === 'development') {
         this.use(function (err, req, res) {
             res.status(err.status || 500);
@@ -50,6 +45,7 @@ module.exports = function routes() {
     // production error handler
     // no stacktraces leaked to user
     this.use(function (err, req, res) {
+        // TODO provide a better error message experience if possible
         res.sendStatus(err.status || 500);
     });
 

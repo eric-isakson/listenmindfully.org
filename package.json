@@ -22,7 +22,9 @@
         "method-override": "*",
         "express-session": "*",
         "csurf": "*",
-        "helmet": "*"
+        "helmet": "*",
+        "winston": "*",
+        "express-winston": "*"
     },
     "scripts": {
         "start": "node ./bin/www"
