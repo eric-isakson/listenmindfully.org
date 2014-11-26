@@ -1,5 +1,6 @@
 <mvc:View
-        controllerName="listenmindfully.ui.Shell"
+        controllerName="listenmindfully.ui.Main"
+        xmlns:lmui="listenmindfully.ui"
         xmlns:l="sap.ui.layout"
         xmlns:u="sap.ui.unified"
         xmlns:mvc="sap.ui.core.mvc"

@@ -1,8 +1,8 @@
-jQuery.sap.require("sap.m.MessageToast");
+jQuery.sap.require('sap.m.MessageToast');
 
-sap.ui.controller("listenmindfully.ui.Shell", {
+sap.ui.controller('listenmindfully.ui.Main', {
     onInit: function () {
-        var oData = {logo: jQuery.sap.getModulePath("sap.ui.core", '/') + "mimes/logo/sap_50x26.png"};
+        var oData = {logo: jQuery.sap.getModulePath('sap.ui.core', '/') + 'mimes/logo/sap_50x26.png'};
         var oModel = new sap.ui.model.json.JSONModel();
         oModel.setData(oData);
         this.getView().setModel(oModel);
@@ -10,7 +10,7 @@ sap.ui.controller("listenmindfully.ui.Shell", {
 
     handlePressConfiguration: function (oEvent) {
         var oItem = oEvent.getSource();
-        var oShell = this.getView().byId("myShell");
+        var oShell = this.getView().byId('myShell');
         var bState = oShell.getShowPane();
         oShell.setShowPane(!bState);
         oItem.setShowMarker(!bState);
@@ -18,27 +18,27 @@ sap.ui.controller("listenmindfully.ui.Shell", {
     },
 
     handleLogoffPress: function (oEvent) {
-        sap.m.MessageToast.show("Logoff Button Pressed");
+        sap.m.MessageToast.show('Logoff Button Pressed');
     },
 
     handleUserItemPressed: function (oEvent) {
-        sap.m.MessageToast.show("User Button Pressed");
+        sap.m.MessageToast.show('User Button Pressed');
     },
 
     handleShellOverlayClosed: function () {
-        sap.m.MessageToast.show("Overlay closed");
+        sap.m.MessageToast.show('Overlay closed');
     },
 
     handleSearchPressed: function (oEvent) {
-        var sQuery = oEvent.getParameter("query");
-        if (sQuery == "") {
+        var sQuery = oEvent.getParameter('query');
+        if (sQuery === '') {
             return;
         }
 
         // create Overlay only once
         if (!this._overlay) {
             this._overlay = sap.ui.xmlfragment(
-                "listenmindfully.ui.ShellOverlay",
+                'listenmindfully.ui.ShellOverlay',
                 this
             );
             this.getView().addDependent(this._overlay);
@@ -48,8 +48,8 @@ sap.ui.controller("listenmindfully.ui.Shell", {
         var aResultData = [];
         for (var i = 0; i < 10; i++) {
             aResultData.push({
-                title: (i + 1) + ". " + sQuery,
-                text: "Lorem ipsum sit dolem"
+                title: (i + 1) + '. ' + sQuery,
+                text: 'Lorem ipsum sit dolem'
             });
         }
         var oData = {
@@ -61,7 +61,7 @@ sap.ui.controller("listenmindfully.ui.Shell", {
         this._overlay.setModel(oModel);
 
         // set reference to shell and open overlay
-        this._overlay.setShell(this.getView().byId("myShell"));
+        this._overlay.setShell(this.getView().byId('myShell'));
         this._overlay.open();
     }
 });
