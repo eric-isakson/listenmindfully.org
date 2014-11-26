@@ -12,8 +12,8 @@ module.exports = function () {
 
     this.use(expressWinston.logger({
         winstonInstance: logger,
-        meta: true,
-        msg: '{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}',
+        meta: this.get('env') === 'development',
+        msg: '{{req.headers["x-forwarded-for"]}} {{res.statusCode}} {{req.method}} {{req.url}} {{res.responseTime}}ms',
         colorStatus: true
     }));
 
