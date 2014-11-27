@@ -2,7 +2,7 @@ jQuery.sap.require('sap.m.MessageToast');
 
 sap.ui.controller('listenmindfully.ui.Main', {
     onInit: function () {
-        var oData = {logo: jQuery.sap.getModulePath('sap.ui.core', '/') + 'mimes/logo/sap_50x26.png'};
+        var oData = {logo: jQuery.sap.getModulePath('listenmindfully.ui', '/') + 'mimes/logo/logo_64x26.png'};
         var oModel = new sap.ui.model.json.JSONModel();
         oModel.setData(oData);
         this.getView().setModel(oModel);
