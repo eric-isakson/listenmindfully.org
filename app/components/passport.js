@@ -99,6 +99,9 @@ exports = module.exports = function (logger, settings, User) {
         function (user, profile) {
             user.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
             user.facebook.email = (profile.emails[0].value || '').toLowerCase();
+            if (!user.displayName) {
+                user.displayName = user.facebook.name;
+            }
         }
     );
 
@@ -112,6 +115,9 @@ exports = module.exports = function (logger, settings, User) {
         function (user, profile) {
             user.twitter.username = profile.username;
             user.twitter.displayName = profile.displayName;
+            if (!user.displayName) {
+                user.displayName = user.twitter.displayName;
+            }
         }
     );
 
@@ -125,6 +131,9 @@ exports = module.exports = function (logger, settings, User) {
         function (user, profile) {
             user.google.name = profile.displayName;
             user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+            if (!user.displayName) {
+                user.displayName = user.google.name;
+            }
         }
     );
 

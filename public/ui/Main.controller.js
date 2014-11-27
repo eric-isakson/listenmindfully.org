@@ -1,10 +1,14 @@
 jQuery.sap.require('sap.m.MessageToast');
+jQuery.sap.require('sap.ui.core.BusyIndicator');
 
 sap.ui.controller('listenmindfully.ui.Main', {
     onInit: function () {
-        var oData = {logo: jQuery.sap.getModulePath('listenmindfully.ui', '/') + 'mimes/logo/logo_50x26.png'};
+        var oData = {};
+        oData.user = jQuery.sap.syncGetJSON('./api/user/current', {}, { displayName: 'Sign Up'});
+        oData.logo = jQuery.sap.getModulePath('listenmindfully.ui', '/') + 'mimes/logo/logo_50x26.png';
         var oModel = new sap.ui.model.json.JSONModel();
         oModel.setData(oData);
+
         this.getView().setModel(oModel);
     },
 

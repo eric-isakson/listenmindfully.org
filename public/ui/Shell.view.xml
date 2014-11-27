@@ -29,7 +29,7 @@
         <u:user>
             <u:ShellHeadUserItem
                     image="sap-icon://person-placeholder"
-                    username="Karl Mustermann"
+                    username="{/user/displayName}"
                     press="handleUserItemPressed"/>
         </u:user>
         <u:search>

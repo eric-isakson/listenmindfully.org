@@ -14,10 +14,7 @@ exports = module.exports = function (logger, settings, db) {
     // TODO log the connection attempt and handle errors
     var userSchema = mongoose.Schema({
 
-        local: {
-            email: String,
-            password: String
-        },
+        displayName: String,
         facebook: {
             id: String,
             token: String,
