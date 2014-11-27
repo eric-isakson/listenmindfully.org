@@ -7,8 +7,9 @@ var express = require('express')
  * This router is used to manage the API routes.
  *
  */
-exports = module.exports = function (user) {
+exports = module.exports = function (user, profile) {
     router.use('/user', user);
+    router.use('/profile', profile);
 
     return router;
 };
@@ -18,4 +19,7 @@ exports = module.exports = function (user) {
  * Component annotations.
  */
 exports['@singleton'] = true;
-exports['@require'] = [ 'handlers/api/user' ];
+exports['@require'] = [
+    'handlers/api/user',
+    'handlers/api/profile'
+];
