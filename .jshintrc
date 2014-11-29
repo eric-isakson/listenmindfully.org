@@ -10,13 +10,13 @@
   "noarg": true,
   "noempty": true,
   "nonew": true,
-  "quotmark": "single",
   "undef": true,
   "unused": true,
   "trailing": true,
     "laxcomma": true,
     "globals": {
         "jQuery": false,
-        "sap": false
+        "sap": false,
+        "listenmindfully": false
     }
 }

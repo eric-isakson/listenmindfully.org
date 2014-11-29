@@ -1,8 +1,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose')
-    , bcrypt = require('bcrypt-nodejs');
+var mongoose = require('mongoose');
 
 /**
  * Initialize the database connection and wires it as the express session store.
@@ -12,6 +11,7 @@ var mongoose = require('mongoose')
 exports = module.exports = function (logger, settings, db) {
     // TODO get settings specific to session db rather than process.env
     // TODO log the connection attempt and handle errors
+    // TODO store tokens on a different but related object, they should not be sent to the client as it is insecure
     var userSchema = mongoose.Schema({
 
         displayName: String,
@@ -35,15 +35,6 @@ exports = module.exports = function (logger, settings, db) {
         }
 
     });
-    // generating a hash
-    userSchema.methods.generateHash = function (password) {
-        return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-    };
-
-    // checking if password is valid
-    userSchema.methods.validPassword = function (password) {
-        return bcrypt.compareSync(password, this.local.password); // TODO not sure about "this" context here
-    };
 
     // create the model for users and expose it to our app
     return db.model('User', userSchema);

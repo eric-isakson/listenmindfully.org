@@ -30,7 +30,7 @@ exports = module.exports = function () {
         }
         if (req.params.id) {
             if (req.params.id === 'current') {
-                res.json(req.user); // TODO any secrets in the user data that I should not send to the client?
+                res.json(req.user);
             }
             else {
                 res.sendStatus(403); // TODO implement user lookup and respond appropriately based on current user's permissions

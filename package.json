@@ -15,7 +15,6 @@
         "passport-twitter": "*",
         "passport-google-oauth": "*",
         "connect-flash": "*",
-        "bcrypt-nodejs": "*",
         "morgan": "*",
         "body-parser": "*",
         "cookie-parser": "*",

@@ -1,15 +1,22 @@
 jQuery.sap.require('sap.m.MessageToast');
-jQuery.sap.require('sap.ui.core.BusyIndicator');
+jQuery.sap.require('sap.m.URLHelper');
 
 sap.ui.controller('listenmindfully.ui.Main', {
-    onInit: function () {
-        var oData = {};
-        oData.user = jQuery.sap.syncGetJSON('./api/user/current', {}, { displayName: 'Sign Up'});
-        oData.logo = jQuery.sap.getModulePath('listenmindfully.ui', '/') + 'mimes/logo/logo_50x26.png';
-        var oModel = new sap.ui.model.json.JSONModel();
-        oModel.setData(oData);
 
-        this.getView().setModel(oModel);
+    onInit: function () {
+//        var oData = {};
+//        var currentUserResponse = jQuery.sap.syncGetJSON('./api/user/current', {});
+//        if (currentUserResponse.success) {
+//            oData.user = currentUserResponse.data;
+//        }
+//        else {
+//            // TODO we aren't logged in, need to present the login view
+//        }
+//        oData.logo = jQuery.sap.getModulePath('listenmindfully.ui', '/') + 'mimes/logo/logo_50x26.png';
+//        var oModel = new sap.ui.model.json.JSONModel();
+//        oModel.setData(oData);
+//
+//        this.getView().setModel(oModel);
     },
 
     handlePressConfiguration: function (oEvent) {
@@ -22,7 +29,7 @@ sap.ui.controller('listenmindfully.ui.Main', {
     },
 
     handleLogoffPress: function (oEvent) {
-        sap.m.MessageToast.show('Logoff Button Pressed');
+        sap.m.URLHelper.redirect('./auth/logout');
     },
 
     handleUserItemPressed: function (oEvent) {

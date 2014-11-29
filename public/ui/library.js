@@ -27,7 +27,6 @@ sap.ui.getCore().initLibrary({
     interfaces: [
     ],
     controls: [
-        'listenmindfully.ui.Shell'
     ],
     elements: [
     ],

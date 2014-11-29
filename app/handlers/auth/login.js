@@ -12,7 +12,7 @@ exports = module.exports = function (passport, isSupported) {
         else {
             passport.authenticate(req.params.service, function (req, res) {
                 // TODO is this the same original request/response pair?
-                res.json(req.user);
+                res.redirect('/');
             });
         }
     }
