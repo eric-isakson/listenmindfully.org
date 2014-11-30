@@ -7,14 +7,14 @@
 exports = module.exports = function (passport, isSupported) {
     function login(req, res, next) {
         if (!/\/callback$/.test(req.path)) {
-            passport.authenticate(req.params.service, { scope: passport.scope[req.params.service] })(req, res);
+            passport.authenticate(req.params.service, {
+                scope: passport.scope[req.params.service]
+            })(req, res);
         }
         else {
-            passport.authenticate(req.params.service, function (err, user) {
-                if (err) {
-                    return next(err);
-                }
-                res.redirect('/');
+            passport.authenticate(req.params.service, {
+                successRedirect: '/',
+                failureRedirect: '/' // TODO consider adding a login failure page that will present the login error message
             })(req, res);
         }
     }
