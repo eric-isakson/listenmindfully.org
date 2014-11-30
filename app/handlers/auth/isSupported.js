@@ -7,7 +7,7 @@
 exports = module.exports = function (passport) {
     function isSupported(req, res, next) {
         if (!passport.scope.hasOwnProperty(req.params.service)) {
-            next(new Error('Unknown authentication service: ' + req.params.service));
+            return next(new Error('Unknown authentication service: ' + req.params.service));
         }
         next();
     }

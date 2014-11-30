@@ -10,7 +10,7 @@ exports = module.exports = function (isLoggedIn, isSupported) {
         user.get(req.params.service).token = undefined;
         user.save(function (err) {
             if (err) {
-                next(err);
+                return next(err);
             }
             res.json(req.user);
         });

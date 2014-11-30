@@ -10,9 +10,11 @@ exports = module.exports = function (passport, isLoggedIn, isSupported) {
             passport.authorize(req.params.service, { scope: passport.scope[req.params.service] });
         }
         else {
-            passport.authorize(req.params.service, function (req, res) {
-                // TODO is this the same original request/response pair?
-                res.json(req.user);
+            passport.authorize(req.params.service, function (err, user) {
+                if (err) {
+                    return next(err);
+                }
+                res.json(user);
             });
         }
     }

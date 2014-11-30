@@ -5,15 +5,17 @@
  *
  */
 exports = module.exports = function (passport, isSupported) {
-    function login(req, res) {
+    function login(req, res, next) {
         if (!/\/callback$/.test(req.path)) {
-            passport.authenticate(req.params.service, { scope: passport.scope[req.params.service] });
+            passport.authenticate(req.params.service, { scope: passport.scope[req.params.service] })(req, res);
         }
         else {
-            passport.authenticate(req.params.service, function (req, res) {
-                // TODO is this the same original request/response pair?
+            passport.authenticate(req.params.service, function (err, user) {
+                if (err) {
+                    return next(err);
+                }
                 res.redirect('/');
-            });
+            })(req, res);
         }
     }
 
