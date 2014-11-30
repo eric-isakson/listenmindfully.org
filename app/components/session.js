@@ -18,7 +18,9 @@ exports = module.exports = function (logger, settings) {
         key: 'session',
         // TODO use settings rather than process.env
         secret: process.env.SESSION_SECRET,
-        store: mogooseSession(db)
+        store: mogooseSession(db),
+        saveUninitialized: true,
+        resave: true
     });
 };
 
