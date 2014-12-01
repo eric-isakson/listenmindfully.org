@@ -1,33 +1,30 @@
 html, body {
     height: 100%;
     width: 100%;
-    margin: 0;
+    margin: 1rem;
     padding: 0;
     border: 0;
+    color: #c2c2c2;
+    background-color: #252525;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+    color: #f1bc78;
+    text-decoration: none;
 }
 
 #loginScreen {
     z-index: 1000;
-    /*position: absolute;*/
-    top: 0;
-    left: 0;
     height: 100%;
     width: 100%;
-    color: #c2c2c2;
-    background-color: #252525;
     background-image: url(./ui/mimes/logo/logo.svg);
-    background-position: 0 1rem;
     background-size: 21rem 21rem;
     background-repeat: no-repeat;
     align-content: center;
     text-align: left;
-    font-family: Arial, Helvetica, sans-serif;
     font-size: 4rem;
     font-weight: bold;
-    /* min-width: 1200px; */
-    /* fix background color issue when horizontal scrollbar is present - caused buttons to not wrap, not sure how to fix */
-    /*border-collapse:collapse;*/
-    /*display : table;*/
 }
 
 #loginScreen > * {
@@ -75,22 +72,11 @@ html, body {
     border-color: #d43f3a;
 }
 
-/*#loginScreen > footer {*/
-    /*display: table-row;*/
-    /*vertical-align : bottom;*/
-    /*height : 1px;*/
-/*}*/
-
 #loginScreen > footer {
     position: absolute;
     bottom: 1rem;
     right: 1rem;
     font-size: 1rem;
-}
-
-#loginScreen > footer a {
-    color: #c2c2c2;
-    text-decoration: none;
 }
 
 #loginScreen > footer a:not(:last-child):after {
