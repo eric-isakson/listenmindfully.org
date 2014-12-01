@@ -1,8 +1,6 @@
 html, body {
-    height: 100%;
-    width: 100%;
-    margin: 1rem;
-    padding: 0;
+    margin: 0;
+    padding: 0 1rem;
     border: 0;
     color: #c2c2c2;
     background-color: #252525;
@@ -14,20 +12,22 @@ a {
     text-decoration: none;
 }
 
-#loginScreen {
-    z-index: 1000;
-    height: 100%;
-    width: 100%;
+body:before {
+    content: '';
     background-image: url(./ui/mimes/logo/logo.svg);
     background-size: 21rem 21rem;
     background-repeat: no-repeat;
-    align-content: center;
+    height: 21rem;
+    width: 21rem;
+    display: inline-block;
+    float: left;
+}
+
+#loginScreen {
+    z-index: 1000;
     text-align: left;
     font-size: 4rem;
     font-weight: bold;
-}
-
-#loginScreen > * {
     margin: 0 0 0 21rem;
 }
 
