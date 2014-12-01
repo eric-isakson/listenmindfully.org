@@ -1,5 +1,4 @@
 jQuery.sap.require('sap.m.MessageToast');
-jQuery.sap.require('sap.m.URLHelper');
 
 sap.ui.controller('listenmindfully.ui.Main', {
 
@@ -29,7 +28,7 @@ sap.ui.controller('listenmindfully.ui.Main', {
     },
 
     handleLogoffPress: function (oEvent) {
-        sap.m.URLHelper.redirect('./auth/logout');
+        window.location = './auth/logout'; // TODO what happened to this API? sap.m.URLHelper.redirect('./auth/logout');
     },
 
     handleUserItemPressed: function (oEvent) {
