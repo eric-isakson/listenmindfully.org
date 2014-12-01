@@ -15,34 +15,33 @@ a {
 body:before {
     content: '';
     background-image: url(./ui/mimes/logo/logo.svg);
-    background-size: 21rem 21rem;
+    background-size: 15rem 15rem;
     background-repeat: no-repeat;
-    height: 21rem;
-    width: 21rem;
-    display: inline-block;
+    height: 15rem;
+    width: 15rem;
     float: left;
 }
 
 #loginScreen {
     z-index: 1000;
     text-align: left;
-    font-size: 4rem;
+    font-size: 3rem;
     font-weight: bold;
-    margin: 0 0 0 21rem;
+    margin: 0 0 0 15rem;
 }
 
 #loginScreen > p {
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 2.5;
 }
 
 #loginScreen > p > a {
     text-decoration: none;
     display: inline-block;
-    padding: 6px 12px;
+    padding: .5rem 1rem;
     margin-top: 0;
     margin-bottom: 0;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: normal;
     line-height: 1.428571429;
     text-align: center;
@@ -51,7 +50,6 @@ body:before {
     cursor: pointer;
     background-image: none;
     border: 1px solid transparent;
-    border-radius: 4px;
 }
 
 #loginScreen #facebook {
