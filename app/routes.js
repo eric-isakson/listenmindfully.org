@@ -14,6 +14,12 @@ var IoC = require('electrolyte')
  */
 module.exports = function routes() {
     // static content ==============================================================
+    this.get('/', function(req, res, next) {
+        if (!req.isAuthenticated()) {
+            return res.redirect('login.html');
+        }
+        next();
+    });
     this.use(express.static('public'));
 
     // authentication  =============================================================

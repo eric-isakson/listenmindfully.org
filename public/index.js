@@ -16,12 +16,15 @@
             , oModel = new sap.ui.model.json.JSONModel(oData)
             , oListenMindfully;
         sap.ui.getCore().setModel(oModel);
-        var oListenMindfully = sap.ui.xmlview('listenmindfully', 'listenmindfully.ui.Shell');
+        oListenMindfully = sap.ui.xmlview('listenmindfully', 'listenmindfully.ui.Shell');
         oListenMindfully.placeAt(eBody, 'only');
     }
 
     var currentUser = getCurrentUser();
     if (currentUser) {
         onLogin(currentUser);
+    }
+    else {
+        window.location = 'http://www.listenmindfully.org/';
     }
 })();
